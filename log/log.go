@@ -75,9 +75,9 @@ func Debug(format string, args ...interface{}) {
 	}
 	defer file.Close()
 	if debug_output {
-		fmt.Fprint(stdout, format_msg(DEBUG, format+"\n", args...))
+		fmt.Fprint(stdout, format_msg(DEBUG, format+"\n", "true", args...))
 		// Log file write
-		fmt.Fprint(file, format_msg(DEBUG, format+"\n", args...))
+		fmt.Fprint(file, format_msg(DEBUG, format+"\n", "false", args...))
 		refreshReadline()
 	}
 }
@@ -92,8 +92,8 @@ func Info(format string, args ...interface{}) {
 	}
 	defer file.Close()
 
-	fmt.Fprint(stdout, format_msg(INFO, format+"\n", args...))
-	fmt.Fprint(file, format_msg(INFO, format+"\n", args...))
+	fmt.Fprint(stdout, format_msg(INFO, format+"\n", "true", args...))
+	fmt.Fprint(file, format_msg(INFO, format+"\n", "false", args...))
 	refreshReadline()
 }
 
@@ -107,8 +107,8 @@ func Important(format string, args ...interface{}) {
 	}
 	defer file.Close()
 
-	fmt.Fprint(stdout, format_msg(IMPORTANT, format+"\n", args...))
-	fmt.Fprint(file, format_msg(INFO, format+"\n", args...))
+	fmt.Fprint(stdout, format_msg(IMPORTANT, format+"\n", "true", args...))
+	fmt.Fprint(file, format_msg(INFO, format+"\n", "false", args...))
 	refreshReadline()
 }
 
@@ -122,8 +122,8 @@ func Warning(format string, args ...interface{}) {
 	}
 	defer file.Close()
 
-	fmt.Fprint(stdout, format_msg(WARNING, format+"\n", args...))
-	fmt.Fprint(file, format_msg(WARNING, format+"\n", args...))
+	fmt.Fprint(stdout, format_msg(WARNING, format+"\n", "true", args...))
+	fmt.Fprint(file, format_msg(WARNING, format+"\n", "false", args...))
 	refreshReadline()
 }
 
@@ -137,8 +137,8 @@ func Error(format string, args ...interface{}) {
 	}
 	defer file.Close()
 
-	fmt.Fprint(stdout, format_msg(ERROR, format+"\n", args...))
-	fmt.Fprint(file, format_msg(ERROR, format+"\n", args...))
+	fmt.Fprint(stdout, format_msg(ERROR, format+"\n", "true", args...))
+	fmt.Fprint(file, format_msg(ERROR, format+"\n", "false", args...))
 	refreshReadline()
 }
 
@@ -152,8 +152,8 @@ func Fatal(format string, args ...interface{}) {
 	}
 	defer file.Close()
 
-	fmt.Fprint(stdout, format_msg(FATAL, format+"\n", args...))
-	fmt.Fprint(file, format_msg(FATAL, format+"\n", args...))
+	fmt.Fprint(stdout, format_msg(FATAL, format+"\n", "true", args...))
+	fmt.Fprint(file, format_msg(FATAL, format+"\n", "false", args...))
 	refreshReadline()
 }
 
@@ -167,8 +167,8 @@ func Success(format string, args ...interface{}) {
 	}
 	defer file.Close()
 
-	fmt.Fprint(stdout, format_msg(SUCCESS, format+"\n", args...))
-	fmt.Fprint(file, format_msg(SUCCESS, format+"\n", args...))
+	fmt.Fprint(stdout, format_msg(SUCCESS, format+"\n", "true", args...))
+	fmt.Fprint(file, format_msg(SUCCESS, format+"\n", "false", args...))
 	refreshReadline()
 }
 
@@ -187,7 +187,7 @@ func Printf(format string, args ...interface{}) {
 	refreshReadline()
 }
 
-func format_msg(lvl int, format string, args ...interface{}) string {
+func format_msg(lvl int, format string, color_opt string, args ...interface{}) string {
 	t := time.Now()
 	var sign, msg *color.Color
 	switch lvl {
@@ -214,6 +214,9 @@ func format_msg(lvl int, format string, args ...interface{}) string {
 	case SUCCESS:
 		sign = color.New(color.FgWhite, color.BgGreen)
 		msg = color.New(color.Reset, color.FgGreen)
+	}
+	if color_opt == "false" {
+		return "[" + fmt.Sprintf("%02d:%02d:%02d", t.Hour(), t.Minute(), t.Second()) + "] [" + fmt.Sprintf("%s", LogLabels[lvl]) + "] " + fmt.Sprintf(format, args...)
 	}
 	time_clr := color.New(color.Reset)
 	return "\r[" + time_clr.Sprintf("%02d:%02d:%02d", t.Hour(), t.Minute(), t.Second()) + "] [" + sign.Sprintf("%s", LogLabels[lvl]) + "] " + msg.Sprintf(format, args...)
